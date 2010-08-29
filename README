@@ -1,0 +1,52 @@
+Introduction
+=============
+
+vim上からRedmineのチケットを参照します。
+
+
+installation
+=============
+
+perlモジュール／スクリプトが必要です。
+また、Redmineのバージョンは1.0.x以上で、
+管理画面から REST API を有効にしておく必要があります。
+
+1. ActiveResourceインストール
+cpan ActiveResource
+
+2. redmine.plにサーバ／ユーザ／パスワードを記述
+__PACKAGE__->site("http://localhost:3000");
+__PACKAGE__->user("user");
+__PACKAGE__->password("password");
+
+
+
+Command
+========
+
+* RedmineViewAllTicket
+ 全てのチケットを表示します
+
+* RedmineViewMyTicket
+ 自分の担当チケットを表示します
+
+ * RedmineSearchTicket
+ チケットを検索します
+
+
+Global Variable
+========
+
+* redmine_pl_bin
+ redmine.plをcallするスクリプト
+
+* redmine_author_id
+ 自分の担当id
+
+
+TODO
+====
+
+* 表示したチケットからリンク先に飛べたりとか
+* 編集もできたりとか
+
