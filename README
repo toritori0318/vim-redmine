@@ -2,6 +2,8 @@ Introduction
 =============
 
 vim上からRedmineのチケットを参照します。
+チケットURLにジャンプする機能も追加。
+
 
 
 installation
@@ -14,10 +16,11 @@ perlモジュール／スクリプトが必要です。
 1. ActiveResourceインストール
 cpan ActiveResource
 
-2. redmine.plにサーバ／ユーザ／パスワードを記述
-__PACKAGE__->site("http://localhost:3000");
-__PACKAGE__->user("user");
-__PACKAGE__->password("password");
+2. .vimrcに サーバ、 (ユーザ／パスワード) or (API Key) を記述
+let g:redmine_auth_site = 'http://localhost:3000'
+let g:redmine_auth_user = 'user'
+let g:redmine_auth_pass = 'password'
+let g:redmine_auth_key  = 'secret'
 
 
 
@@ -28,7 +31,7 @@ Command
  全てのチケットを表示します
 
 * RedmineViewMyTicket
- 自分の担当チケットを表示します
+ 自分の担当チケットを表示します（要redmine_author_id）
 
  * RedmineSearchTicket
  チケットを検索します
@@ -36,6 +39,21 @@ Command
 
 Global Variable
 ========
+
+* redmine_auth_site
+ RedmineサイトURL
+
+* redmine_auth_user
+ RedmineユーザID
+
+* redmine_auth_pass
+ Redmineパスワード
+
+* redmine_auth_key
+ Redmine API Key
+
+* redmine_browser
+ ブラウザ起動コマンド
 
 * redmine_pl_bin
  redmine.plをcallするスクリプト
@@ -47,6 +65,5 @@ Global Variable
 TODO
 ====
 
-* 表示したチケットからリンク先に飛べたりとか
 * 編集もできたりとか
 
