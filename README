@@ -1,26 +1,41 @@
 Introduction
 =============
 
-vim上からRedmineのチケットを参照します。
-チケットURLにジャンプする機能も追加。
+ You can look over the information on redmine with vim. 
+
+
+Function
+=============
+
+ 1. Display ticket and display outline of ticket on Redmine with vim.
+ 2. It is possible to jump to URL of the ticket. 
+
+
+
+Requirement
+=============
+
+ 1. perl module(ActiveResource)
+ 2. Redmine version >= 1.0.x
+ 3. enable Redmine REST API
 
 
 
 installation
 =============
 
-perlモジュール／スクリプトが必要です。
-また、Redmineのバージョンは1.0.x以上で、
-管理画面から REST API を有効にしておく必要があります。
+1. Install ActiveResource
+cpan -i ActiveResource
 
-1. ActiveResourceインストール
-cpan ActiveResource
+2. Make sure "redmine.pl" is in vim extension directory.
+(default ~/.vim/ext/redmine.pl)
 
-2. .vimrcに サーバ、 (ユーザ／パスワード) or (API Key) を記述
+3. edit .vimrc
 let g:redmine_auth_site = 'http://localhost:3000'
 let g:redmine_auth_user = 'user'
 let g:redmine_auth_pass = 'password'
 let g:redmine_auth_key  = 'secret'
+let g:redmine_author_id = '5'
 
 
 
@@ -28,42 +43,43 @@ Command
 ========
 
 * RedmineViewAllTicket
- 全てのチケットを表示します
+ All tickets are displayed.
 
 * RedmineViewMyTicket
- 自分の担当チケットを表示します（要redmine_author_id）
+ Assigned ticket is displayed. (required g:redmine_author_id)
 
- * RedmineSearchTicket
- チケットを検索します
+* RedmineSearchTicket
+ Search tickets.
+
 
 
 Global Variable
 ========
 
 * redmine_auth_site
- RedmineサイトURL
+ Redmine URL
 
 * redmine_auth_user
- RedmineユーザID
+ Redmine UserID
 
 * redmine_auth_pass
- Redmineパスワード
+ Redmine User pass
 
 * redmine_auth_key
  Redmine API Key
 
 * redmine_browser
- ブラウザ起動コマンド
+ Launch browser
 
 * redmine_pl_bin
- redmine.plをcallするスクリプト
+ redmine.pl script
 
 * redmine_author_id
- 自分の担当id
+ Redmine assigned id
 
 
 TODO
 ====
 
-* 編集もできたりとか
+* I want to edit Ticket with vim.
 

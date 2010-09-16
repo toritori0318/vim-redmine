@@ -1,0 +1,85 @@
+Introduction
+=============
+
+vim上からRedmineのチケット情報を参照します。
+
+
+Function
+=============
+
+ 1. Redmineのチケット情報をvimで表示します
+ 2. チケット番号を指定してURLにジャンプ出来ます. 
+
+
+
+Requirement
+=============
+
+ 1. perlモジュール(ActiveResource)
+ 2. Redmine version >= 1.0.x
+ 3. Redmine REST API を有効にする
+
+
+
+installation
+=============
+
+1. ActiveResourceインストール
+cpan -i ActiveResource
+
+2. redmine.pl を指定位置に配置します
+(default ~/.vim/ext/redmine.pl)
+
+3. .vimrcに サーバ、 (ユーザ／パスワード) or (API Key) を記述
+let g:redmine_auth_site = 'http://localhost:3000'
+let g:redmine_auth_user = 'user'
+let g:redmine_auth_pass = 'password'
+let g:redmine_auth_key  = 'secret'
+let g:redmine_author_id = '5'
+
+
+
+Command
+========
+
+* RedmineViewAllTicket
+ 全てのチケットを表示します
+
+* RedmineViewMyTicket
+ 自分の担当チケットを表示します（要redmine_author_id）
+
+ * RedmineSearchTicket
+ チケットを検索します
+
+
+
+Global Variable
+========
+
+* redmine_auth_site
+ RedmineサイトURL
+
+* redmine_auth_user
+ RedmineユーザID
+
+* redmine_auth_pass
+ Redmineパスワード
+
+* redmine_auth_key
+ Redmine API Key
+
+* redmine_browser
+ ブラウザ起動コマンド
+
+* redmine_pl_bin
+ redmine.plをcallするスクリプト
+
+* redmine_author_id
+ 自分の担当id
+
+
+TODO
+====
+
+* 編集もできたりとか
+
