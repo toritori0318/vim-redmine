@@ -36,6 +36,7 @@ let g:redmine_auth_user = 'user'
 let g:redmine_auth_pass = 'password'
 let g:redmine_auth_key  = 'secret'
 let g:redmine_author_id = '5'
+let g:redmine_project_id = '1'
 
 
 
@@ -48,9 +49,15 @@ Command
 * RedmineViewMyTicket
  自分の担当チケットを表示します（要redmine_author_id）
 
- * RedmineSearchTicket
+* RedmineViewMyProjectTicket
+ 自分の担当チケットを表示します（要redmine_author_id）
+ 条件にプロジェクトIDも指定できます
+
+* RedmineSearchTicket
  チケットを検索します
 
+* RedmineSearchProject
+ プロジェクトを検索します
 
 
 Global Variable
@@ -75,7 +82,11 @@ Global Variable
  redmine.plをcallするスクリプト
 
 * redmine_author_id
- 自分の担当id
+ RedmineViewMyTicket/RedmineViewMyProjectTicketで利用される担当id
+
+* redmine_project_id
+ RedmineViewMyProjectTicketで利用されるプロジェクトid
+ 必須ではありません。指定がない場合は自動でマイプロジェクトを検索してくれます
 
 
 TODO

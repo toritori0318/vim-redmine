@@ -1,9 +1,6 @@
-package Issue;
-use parent 'ActiveResource::Base';
-
-use Data::Dumper;
+package RedmineBase;
+use base 'ActiveResource::Base';
 use Lingua::EN::Inflect qw(PL);
-use LWP::UserAgent;
 
 sub new {
     my $class = shift;
@@ -34,11 +31,12 @@ sub search {
     my (undef, $attr) = each %$hash;
     if($attr->{type} eq 'array'){
         my $a = {};
-        my $issues = $attr->{issue};
-        $issues = [$issues] if ref $issues ne 'ARRAY';
-        foreach my $issue (@$issues){
+        (my $attr_name = $resource_name) =~ s/s$//;
+        my $rows = $attr->{$attr_name};
+        $rows = [$rows] if ref $rows ne 'ARRAY';
+        foreach my $row (@$rows){
             my $record = $class->new;
-            $record->load($issue);
+            $record->load($row);
             push @records, $record;
         }
     }else{
@@ -66,10 +64,17 @@ no warnings 'redefine';
     return $url.$path;
 };
 
+package Project;
+use base 'RedmineBase';
+
+package Issue;
+use base 'RedmineBase';
+
+
 
 package main;
 use Getopt::Long;
-my $mode      = "v";  # v:view e:edit d:delete
+my $mode      = "i";  # i:issue p:project
 my $condition;
 GetOptions (
    'mode=s' => \$mode,
@@ -83,21 +88,43 @@ use Encode;
 use URI;
 use utf8;
 
+my $info = {
+    site => $site,
+    user => $user,
+    pass => $pass,
+    #key  => $key,
+};
+
+sub view_project {
+    my $where = shift;
+    # Find existing project
+    my $c = Project->new($info);
+    my $projects = $c->search( $where );
+
+    foreach my $project (@$projects){
+        print "#",$project->id," ",encode_utf8($project->name),"\n" if $project->id;
+    }
+}
+
+sub view_issue {
+    my $where = shift;
+    # Find existing ticket
+    my $c = Issue->new($info);
+    my $issues = $c->search( $where );
+
+    foreach my $issue (@$issues){
+        print "#",$issue->id," ",encode_utf8($issue->description),"\n" if $issue->id;
+    }
+}
+
 my $uri = URI->new("http://hoge.org/?$condition"); 
 my %where = $uri->query_form;
 $where{key} = $key if $key;
 
-# Find existing ticket
-my $c = Issue->new(
-    {
-        site => $site,
-        user => $user,
-        pass => $pass,
-        #key  => $key,
-    },
-);
-my $issues = $c->search( \%where );
-
-foreach my $issue (@$issues){
-    print "#",$issue->id," ",encode_utf8($issue->description),"\n" if $issue->id;
+if($mode eq 'i'){
+    view_issue(\%where);
 }
+elsif($mode eq 'p'){
+    view_project(\%where);
+}
+

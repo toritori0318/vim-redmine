@@ -21,15 +21,26 @@ if !exists('g:redmine_browser')
     let g:redmine_browser = 'open -a Firefox'
     "let g:redmine_browser = 'C:\Program Files\Mozilla Firefox\firefox.exe'
 endif
+if !exists('g:redmine_author_id')
+    let g:redmine_author_id = ''
+endif
+if !exists('g:redmine_project_id')
+    let g:redmine_project_id = ''
+endif
 
 command RedmineViewAllTicket :call RedmineViewAllTicket()
 command RedmineViewMyTicket :call RedmineViewMyTicket()
+command RedmineViewMyProjectTicket :call RedmineViewMyProjectTicket()
 command -nargs=* RedmineSearchTicket :call RedmineSearchTicket(<f-args>)
+command -nargs=* RedmineSearchProject :call RedmineSearchProject(0)
 
-function! RedmineSearchTicket(args)
+function! RedmineCreateCommand(args, mode)
     let s:cmd = [g:redmine_pl_bin]
     if !empty(a:args)
        call add(s:cmd, '--condition='''. a:args .'''')
+    endif
+    if !empty(a:mode)
+       call add(s:cmd, '--mode='''. a:mode .'''')
     endif
     if !empty(g:redmine_auth_site)
        call add(s:cmd, '--site='. g:redmine_auth_site )
@@ -43,7 +54,11 @@ function! RedmineSearchTicket(args)
     if !empty(g:redmine_auth_key)
        call add(s:cmd, '--key='. g:redmine_auth_key )
     endif
-    let s:getissue = system( join(s:cmd,' ') )
+    return s:cmd
+endfunc
+function! RedmineSearchTicket(args)
+    echo join(RedmineCreateCommand(a:args, 'i'),' ')
+    let s:getissue = system( join(RedmineCreateCommand(a:args, 'i'),' ') )
     echo s:getissue
     if s:getissue =~ 'With HTTP Status' " get error
         return
@@ -58,22 +73,57 @@ function! RedmineSearchTicket(args)
     endif
     return
 endfunc
+function! RedmineSearchProject(input_flg)
+    echo join(RedmineCreateCommand('', 'p'))
+    let s:getproject = system( join(RedmineCreateCommand('', 'p'),' ') )
+    echo s:getproject
+    if s:getproject =~ 'With HTTP Status' " get error
+        return
+    endif
+
+    if a:input_flg == 1 
+        let s:pkey = input("input project id:")
+        if s:pkey != "" && s:pkey =~ '^\d*$'
+            return s:pkey
+        endif
+    endif
+    return
+endfunc
 function! RedmineViewAllTicket()
     call RedmineSearchTicket('')
 endfunc
 
 function! RedmineViewMyTicket()
-    let cond_author = RedmineConditionAuthor()
+    let cond_author = RedmineConditionAuthor(g:redmine_author_id)
     call RedmineSearchTicket(cond_author)
+endfunc
+
+function! RedmineViewMyProjectTicket()
+    let cond_author = RedmineConditionAuthor(g:redmine_author_id)
+    if !empty(g:redmine_project_id)
+        let cond_project = RedmineConditionProject(g:redmine_project_id)
+        call RedmineSearchTicket(join([cond_project, cond_author], '&'))
+    else 
+        let project_id = RedmineSearchProject(1)
+        if !empty(project_id)
+            let cond_project = RedmineConditionProject(project_id)
+            call RedmineSearchTicket(join([cond_project, cond_author], '&'))
+        endif
+    endif
 endfunc
 
 function! RedmineEditTicket()
     return
 endfunc
 
-function! RedmineConditionAuthor()
-    if !empty(g:redmine_author_id)
-        return 'author_id=' . g:redmine_author_id
+function! RedmineConditionAuthor(args)
+    if !empty(a:args)
+        return 'author_id=' . a:args
+    endif
+endfunc
+function! RedmineConditionProject(args)
+    if !empty(a:args)
+        return 'project_id=' . a:args
     endif
 endfunc
 
