@@ -57,7 +57,6 @@ function! RedmineCreateCommand(args, mode)
     return s:cmd
 endfunc
 function! RedmineSearchTicket(args)
-    echo join(RedmineCreateCommand(a:args, 'i'),' ')
     let s:getissue = system( join(RedmineCreateCommand(a:args, 'i'),' ') )
     echo s:getissue
     if s:getissue =~ 'With HTTP Status' " get error
