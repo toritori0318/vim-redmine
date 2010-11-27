@@ -15,7 +15,7 @@ Function
 Requirement
 =============
 
- 1. perl module(ActiveResource)
+ 1. webapi.vim / xmlparser.vim
  2. Redmine version >= 1.0.x
  3. enable Redmine REST API
 
@@ -24,16 +24,10 @@ Requirement
 installation
 =============
 
-1. Install ActiveResource
-cpan -i ActiveResource
+1. Install webapi.vim and xmlparser.vim
 
-2. Make sure "redmine.pl" is in vim extension directory.
-(default ~/.vim/ext/redmine.pl)
-
-3. edit ~/.vimrc
+2. edit ~/.vimrc
 let g:redmine_auth_site = 'http://localhost:3000'
-let g:redmine_auth_user = 'user'
-let g:redmine_auth_pass = 'password'
 let g:redmine_auth_key  = 'secret'
 let g:redmine_author_id = '5'
 let g:redmine_project_id = '1'
@@ -53,11 +47,14 @@ Command
  Assigned ticket is displayed. (required g:redmine_author_id)
  You can also specify Project_id. 
 
-* RedmineSearchTicket
+* RedmineSearchTicket <condition>
  Search tickets.
 
-* RedmineSearchProject
+* RedmineSearchProject <condition>
  Search project.
+
+* RedmineEditTicket <issue_id> <edit_text>
+ Edit Ticket.
 
 
 Global Variable
@@ -66,20 +63,11 @@ Global Variable
 * redmine_auth_site
  Redmine URL
 
-* redmine_auth_user
- Redmine UserID
-
-* redmine_auth_pass
- Redmine User pass
-
 * redmine_auth_key
  Redmine API Key
 
 * redmine_browser
  Launch browser
-
-* redmine_pl_bin
- redmine.pl script
 
 * redmine_author_id
  Assigned_id used in RedmineViewMyTicket/RedmineViewMyProjectTicket.
@@ -88,9 +76,4 @@ Global Variable
  used in RedmineViewMyProjectTicket.
  This is not required. "MyProject" will be retrieved automatically if you don't specify project_id.
 
-
-TODO
-====
-
-* I want to edit Ticket with vim.
 

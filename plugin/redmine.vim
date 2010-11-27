@@ -2,17 +2,8 @@ if exists("g:redmine_loaded") && g:redmine_loaded
     finish
 endif
 let g:redmine_loaded = 1
-if !exists('g:redmine_pl_bin')
-    let g:redmine_pl_bin = 'perl ~/.vim/ext/redmine.pl'
-endif
 if !exists('g:redmine_auth_site')
     let g:redmine_auth_site = 'http://localhost:3000'
-endif
-if !exists('g:redmine_auth_user')
-    let g:redmine_auth_user = ''
-endif
-if !exists('g:redmine_auth_pass')
-    let g:redmine_auth_pass = ''
 endif
 if !exists('g:redmine_auth_key')
     let g:redmine_auth_key = ''
@@ -33,96 +24,121 @@ command RedmineViewMyTicket :call RedmineViewMyTicket()
 command RedmineViewMyProjectTicket :call RedmineViewMyProjectTicket()
 command -nargs=* RedmineSearchTicket :call RedmineSearchTicket(<f-args>)
 command -nargs=* RedmineSearchProject :call RedmineSearchProject(0)
+command -nargs=* RedmineEditTicket :call RedmineEditTicket(<f-args>)
 
-function! RedmineCreateCommand(args, mode)
-    let s:cmd = [g:redmine_pl_bin]
-    if !empty(a:args)
-       call add(s:cmd, '--condition='''. a:args .'''')
-    endif
-    if !empty(a:mode)
-       call add(s:cmd, '--mode='''. a:mode .'''')
-    endif
-    if !empty(g:redmine_auth_site)
-       call add(s:cmd, '--site='. g:redmine_auth_site )
-    endif
-    if !empty(g:redmine_auth_user)
-       call add(s:cmd, '--user='. g:redmine_auth_user )
-    endif
-    if !empty(g:redmine_auth_pass)
-       call add(s:cmd, '--pass='. g:redmine_auth_pass )
-    endif
-    if !empty(g:redmine_auth_key)
-       call add(s:cmd, '--key='. g:redmine_auth_key )
-    endif
-    return s:cmd
-endfunc
 function! RedmineSearchTicket(args)
-    let s:getissue = system( join(RedmineCreateCommand(a:args, 'i'),' ') )
-    echo s:getissue
-    if s:getissue =~ 'With HTTP Status' " get error
-        return
+    let stat = RedmineAPIIssueList(a:args)
+    if !stat 
+        echo 'issue not found'
+        return 0
     endif
 
-    let s:pkey = input("input issue id:")
+    let s:pkey = input("input issue id: ")
     if s:pkey != "" && s:pkey =~ '^\d*$'
         let s:site_path = g:redmine_auth_site .'/issues/'.s:pkey
         let s:ret = system(g:redmine_browser. ' '. s:site_path)
     else
         echoh None
     endif
-    return
+    return 1
+endfunc
+function! RedmineAPIIssueList(args)
+    let url = RedmineCreateCommand('issue_list', '', a:args)
+    let ret = http#get(url)
+    if ret.content == ' '
+        return 0
+    endif
+
+    let num = 0
+    let dom = xml#parse(ret.content)
+    for elem in dom.findAll("issue")
+      echo "#" . elem.find("id").value() . ' ' . elem.find("description").value()
+      let num += 1
+    endfor
+    return num
 endfunc
 function! RedmineSearchProject(input_flg)
-    echo join(RedmineCreateCommand('', 'p'))
-    let s:getproject = system( join(RedmineCreateCommand('', 'p'),' ') )
-    echo s:getproject
-    if s:getproject =~ 'With HTTP Status' " get error
-        return
+    let stat = RedmineAPIProjects()
+    if !stat
+        echo 'project not found'
+        return 0
     endif
 
     if a:input_flg == 1 
-        let s:pkey = input("input project id:")
+        let s:pkey = input("input project id: ")
         if s:pkey != "" && s:pkey =~ '^\d*$'
             return s:pkey
         endif
     endif
-    return
+    return 1
+endfunc
+function! RedmineAPIProjects()
+    let url = RedmineCreateCommand('project_list','','')
+    let ret = http#get(url)
+    if ret.content == ' '
+        return 0
+    endif
+
+    let num = 0
+    let dom = xml#parse(ret.content)
+    for elem in dom.findAll("project")
+      echo "#" . elem.find("id").value() . ' ' . elem.find("name").value()
+      let num += 1
+    endfor
+    return num
 endfunc
 function! RedmineViewAllTicket()
     call RedmineSearchTicket('')
 endfunc
 
 function! RedmineViewMyTicket()
-    let cond_author = RedmineConditionAuthor(g:redmine_author_id)
-    call RedmineSearchTicket(cond_author)
+    call RedmineSearchTicket({'author_id' : g:redmine_author_id})
 endfunc
 
 function! RedmineViewMyProjectTicket()
-    let cond_author = RedmineConditionAuthor(g:redmine_author_id)
+    let cond = {'author_id' : g:redmine_author_id}
     if !empty(g:redmine_project_id)
-        let cond_project = RedmineConditionProject(g:redmine_project_id)
-        call RedmineSearchTicket(join([cond_project, cond_author], '&'))
-    else 
+        let cond['project_id'] = g:redmine_project_id
+        call RedmineSearchTicket(cond)
+    else
         let project_id = RedmineSearchProject(1)
         if !empty(project_id)
-            let cond_project = RedmineConditionProject(project_id)
-            call RedmineSearchTicket(join([cond_project, cond_author], '&'))
+            let cond['project_id'] = project_id
+            call RedmineSearchTicket(cond)
         endif
     endif
 endfunc
 
-function! RedmineEditTicket()
-    return
+function! RedmineCreateCommand(mode, id, args)
+    let s:url = g:redmine_auth_site . '/'
+    if !empty(a:mode)
+        if a:mode == 'issue_list'
+            let s:url .= 'issues.xml'
+        elseif a:mode == 'project_list'
+            let s:url .= 'projects.xml'
+        elseif a:mode == 'issue_edit'
+            let s:url .= 'issues/'. a:id .'.xml'
+        endif
+    endif
+    let s:param = ['']
+    if !empty(g:redmine_auth_key)
+       call add(s:param, 'key='. g:redmine_auth_key )
+    endif
+    if !empty(a:args)
+        for key in keys(a:args)
+            call add(s:param, key . '='. a:args[key] )
+        endfor
+    endif
+    return s:url . '?' . join(s:param, '&')
 endfunc
 
-function! RedmineConditionAuthor(args)
-    if !empty(a:args)
-        return 'author_id=' . a:args
-    endif
+function! RedmineEditTicket(issue_id, text)
+    call RedmineAPIIssueEdit(a:issue_id, a:text)
+    return
 endfunc
-function! RedmineConditionProject(args)
-    if !empty(a:args)
-        return 'project_id=' . a:args
-    endif
+function! RedmineAPIIssueEdit(issue_id, text)
+    let url = RedmineCreateCommand('issue_edit', a:issue_id, '')
+    let put_xml = '<issue><description>'. a:text .'</description></issue>'
+    let ret = http#post(url, put_xml, {'Content-Type' : 'text/xml'} , 'PUT')
 endfunc
 
