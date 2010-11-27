@@ -15,7 +15,7 @@ Function
 Requirement
 =============
 
- 1. webapi.vim / xmlparser.vim
+ 1. webapi.vim
  2. Redmine version >= 1.0.x
  3. enable Redmine REST API
 
@@ -24,7 +24,7 @@ Requirement
 installation
 =============
 
-1. Install webapi.vim and xmlparser.vim
+1. Install webapi.vim
 
 2. edit ~/.vimrc
 let g:redmine_auth_site = 'http://localhost:3000'

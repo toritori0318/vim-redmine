@@ -15,7 +15,7 @@ Function
 Requirement
 =============
 
- 1. webapi.vim / xmlparser.vim
+ 1. webapi.vim
  2. Redmine version >= 1.0.x
  3. Redmine REST API を有効にする
 
@@ -24,7 +24,7 @@ Requirement
 installation
 =============
 
-1. webapi.vim / xmlparser.vim をインストール
+1. webapi.vim をインストール
 
 2. .vimrcに サーバ、 API Key を記述
 let g:redmine_auth_site = 'http://localhost:3000'
