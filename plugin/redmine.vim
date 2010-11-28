@@ -138,7 +138,14 @@ function! RedmineEditTicket(issue_id, text)
 endfunc
 function! RedmineAPIIssueEdit(issue_id, text)
     let url = RedmineCreateCommand('issue_edit', a:issue_id, '')
-    let put_xml = '<issue><description>'. a:text .'</description></issue>'
+    let tx = a:text
+    let tx = substitute(tx, '&', '\&amp;',  'g')
+    let tx = substitute(tx, '<', '\&lt;',   'g')
+    let tx = substitute(tx, '>', '\&gt;',   'g')
+    let tx = substitute(tx, "'", '\&apos;', 'g')
+    let tx = substitute(tx, '"', '\&quot;', 'g')
+    let put_xml = '<issue><description>'. tx .'</description></issue>'
+    echo put_xml
     let ret = http#post(url, put_xml, {'Content-Type' : 'text/xml'} , 'PUT')
 endfunc
 
