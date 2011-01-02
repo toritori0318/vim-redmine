@@ -144,7 +144,7 @@ function! RedmineAPIIssueEdit(issue_id, text)
     let tx = substitute(tx, '>', '\&gt;',   'g')
     let tx = substitute(tx, "'", '\&apos;', 'g')
     let tx = substitute(tx, '"', '\&quot;', 'g')
-    let put_xml = '<issue><description>'. tx .'</description></issue>'
+    let put_xml = '<issue><notes>'. tx .'</notes></issue>'
     echo put_xml
     let ret = http#post(url, put_xml, {'Content-Type' : 'text/xml'} , 'PUT')
 endfunc
