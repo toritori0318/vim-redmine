@@ -37,6 +37,9 @@ let g:redmine_project_id = '1'
 Command
 ========
 
+* RedmineViewTicket <issue_id>
+ a ticket is displayed. 
+
 * RedmineViewAllTicket
  All tickets are displayed.
 
