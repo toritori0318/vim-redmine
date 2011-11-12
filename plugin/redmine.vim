@@ -25,6 +25,7 @@ command RedmineViewMyProjectTicket :call RedmineViewMyProjectTicket()
 command -nargs=* RedmineSearchTicket :call RedmineSearchTicket(<f-args>)
 command -nargs=* RedmineSearchProject :call RedmineSearchProject(0)
 command -nargs=* RedmineEditTicket :call RedmineEditTicket(<f-args>)
+command -nargs=* RedmineViewTicket :call RedmineViewTicket(<f-args>)
 
 function! RedmineSearchTicket(args)
     let stat = RedmineAPIIssueList(a:args)
@@ -95,6 +96,28 @@ function! RedmineViewMyTicket()
     call RedmineSearchTicket({'author_id' : g:redmine_author_id})
 endfunc
 
+function! RedmineViewTicket(id)
+    let url = RedmineCreateCommand('issue_list', a:id, {'include' : 'journals'})
+    let ret = http#get(url)
+    if ret.content == ' '
+        return 0
+    endif
+
+    let num = 0
+    let dom = xml#parse(ret.content)
+    echo "#" . dom.find("id").value() . ' ' . dom.find("subject").value()
+    echo "\n"
+    echo dom.find("description").value()
+    echo "\n"
+    echo "--\n"
+    for elem in dom.findAll("journal")
+      echo elem.find("user").attr.name . ' ' . elem.find("created_on").value()
+      echo elem.find("notes").value()
+      echo "--\n"
+    endfor
+    return num
+endfunc
+
 function! RedmineViewMyProjectTicket()
     let cond = {'author_id' : g:redmine_author_id}
     if !empty(g:redmine_project_id)
@@ -113,7 +136,11 @@ function! RedmineCreateCommand(mode, id, args)
     let s:url = g:redmine_auth_site . '/'
     if !empty(a:mode)
         if a:mode == 'issue_list'
-            let s:url .= 'issues.xml'
+            if !empty(a:id)
+                let s:url .= 'issues/' . a:id . '.xml'
+            else
+                let s:url .= 'issues.xml'
+            endif
         elseif a:mode == 'project_list'
             let s:url .= 'projects.xml'
         elseif a:mode == 'issue_edit'
