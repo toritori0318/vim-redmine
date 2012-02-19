@@ -26,6 +26,7 @@ command -nargs=* RedmineSearchTicket :call RedmineSearchTicket(<f-args>)
 command -nargs=* RedmineSearchProject :call RedmineSearchProject(0)
 command -nargs=* RedmineEditTicket :call RedmineEditTicket(<f-args>)
 command -nargs=* RedmineViewTicket :call RedmineViewTicket(<f-args>)
+command -nargs=* RedmineAddTicket :call RedmineAddTicket(<f-args>)
 
 function! RedmineSearchTicket(args)
     let stat = RedmineAPIIssueList(a:args)
@@ -145,6 +146,8 @@ function! RedmineCreateCommand(mode, id, args)
             let s:url .= 'projects.xml'
         elseif a:mode == 'issue_edit'
             let s:url .= 'issues/'. a:id .'.xml'
+        elseif a:mode == 'issue_add'
+            let s:url .= 'issues.xml'
         endif
     endif
     let s:param = ['']
@@ -175,4 +178,19 @@ function! RedmineAPIIssueEdit(issue_id, text)
     echo put_xml
     let ret = http#post(url, put_xml, {'Content-Type' : 'text/xml'} , 'PUT')
 endfunc
+function! RedmineAddTicket(subject)
+    " add ticket with only subject
+    if !empty(g:redmine_project_id)
+        let l:project_id = g:redmine_project_id
+    else
+        let l:project_id = RedmineSearchProject(1)
+    endif
 
+    let url = RedmineCreateCommand('issue_add', '', '')
+    let put_xml = '<issue>'
+    let put_xml .= '<project_id>' . l:project_id . '</project_id>'
+    let put_xml .= '<subject>'    . iconv(a:subject, &encoding, "utf-8") . '</subject>'
+    let put_xml .= '</issue>'
+    let ret = http#post(url, put_xml, {'Content-Type' : 'text/xml'} , 'POST')
+    echomsg put_xml
+endfunc
