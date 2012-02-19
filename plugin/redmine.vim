@@ -191,19 +191,9 @@ endfunc
 
 function! RedmineAddTicket(subject)
     " add ticket with only subject
-    if !empty(g:redmine_project_id)
-        let l:project_id = g:redmine_project_id
-    else
-        let l:project_id = RedmineSearchProject(1)
-    endif
+    call s:setProjectId()
 
-    let url = RedmineCreateCommand('issue_add', '', '')
-    let put_xml = '<issue>'
-    let put_xml .= '<project_id>' . l:project_id . '</project_id>'
-    let put_xml .= '<subject>'    . iconv(a:subject, &encoding, "utf-8") . '</subject>'
-    let put_xml .= '</issue>'
-    let ret = http#post(url, put_xml, {'Content-Type' : 'text/xml'} , 'POST')
-    echomsg put_xml
+    call s:redmineAddTicketPost(a:subject, s:project_id, '')
 endfunc
 
 function! RedmineAddTicketWithDiscription(...)
