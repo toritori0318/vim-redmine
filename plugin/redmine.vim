@@ -18,6 +18,15 @@ endif
 if !exists('g:redmine_project_id')
     let g:redmine_project_id = ''
 endif
+if !exists('g:redmine_project_id_remember') " if zero, ask project_id everytime when add a ticket.
+    let g:redmine_project_id_remember = '1'
+endif
+if !exists('g:redmine_temporary_dir')
+    let g:redmine_temporary_dir = $HOME . '/.redmine-vim'
+endif
+if !isdirectory(g:redmine_temporary_dir)
+    call mkdir(g:redmine_temporary_dir, 'p')
+endif
 
 command RedmineViewAllTicket :call RedmineViewAllTicket()
 command RedmineViewMyTicket :call RedmineViewMyTicket()
@@ -27,6 +36,7 @@ command -nargs=* RedmineSearchProject :call RedmineSearchProject(0)
 command -nargs=* RedmineEditTicket :call RedmineEditTicket(<f-args>)
 command -nargs=* RedmineViewTicket :call RedmineViewTicket(<f-args>)
 command -nargs=* RedmineAddTicket :call RedmineAddTicket(<f-args>)
+command -nargs=* RedmineAddTicketWithDiscription :call RedmineAddTicketWithDiscription(<f-args>)
 
 function! RedmineSearchTicket(args)
     let stat = RedmineAPIIssueList(a:args)
@@ -178,6 +188,7 @@ function! RedmineAPIIssueEdit(issue_id, text)
     echo put_xml
     let ret = http#post(url, put_xml, {'Content-Type' : 'text/xml'} , 'PUT')
 endfunc
+
 function! RedmineAddTicket(subject)
     " add ticket with only subject
     if !empty(g:redmine_project_id)
@@ -193,4 +204,61 @@ function! RedmineAddTicket(subject)
     let put_xml .= '</issue>'
     let ret = http#post(url, put_xml, {'Content-Type' : 'text/xml'} , 'POST')
     echomsg put_xml
+endfunc
+
+function! RedmineAddTicketWithDiscription(...)
+    " add ticket with subject and discription(with tmp buffer)
+    let l:subject = a:0 > 0 ? a:1 :''
+    call s:setProjectId()
+
+    " open tempbuffer
+    call s:setupDiscriptionBuffer()
+    call append(0, l:subject)
+    autocmd BufWritePost <buffer> call s:redmineAddTicketWithDiscriptionWrite() | bdelete
+endfunc
+
+function! s:redmineAddTicketWithDiscriptionWrite()
+    let l:subject = getline(1)
+    let l:discription = join(getline(2, "$"),"\n")
+    call s:redmineAddTicketPost(l:subject, s:project_id, l:discription)
+endfunc
+
+function! s:redmineAddTicketPost(subject, project_id, ...)
+    let l:discription = a:0 > 0 ? a:1 : ''
+
+    let url = RedmineCreateCommand('issue_add', '', '')
+    let put_xml = '<issue>'
+    let put_xml .= '<project_id>' . a:project_id . '</project_id>'
+    let put_xml .= '<subject>'    . iconv(a:subject, &encoding, "utf-8") . '</subject>'
+    if !empty(l:discription)
+        let put_xml .= '<description>' . iconv(l:discription, &encoding, "utf-8") . '</description>'
+    endif
+    let put_xml .= '</issue>'
+    let ret = http#post(url, put_xml, {'Content-Type' : 'text/xml'} , 'POST')
+    echomsg ' Add ticket "' . a:subject . '" complete.'
+endfunc
+
+function! s:setProjectId()
+    if !empty(g:redmine_project_id)
+        let s:project_id = g:redmine_project_id
+    else
+        if !exists('s:project_id')
+            let s:project_id = RedmineSearchProject(1)
+        elseif (g:redmine_project_id_remember == 0)
+            let s:project_id = RedmineSearchProject(1)
+        endif
+    endif
+endfunc
+
+function! s:setupDiscriptionBuffer()
+    let bufnr = bufwinnr('redmine_discription')
+    if bufnr > 0
+        exec bufnr.'wincmd w'
+    else
+        exec 'below split '.g:redmine_temporary_dir.'/redmine_discription'
+    endif
+    setlocal modifiable
+    setlocal noswapfile
+
+    silent %delete _
 endfunc
