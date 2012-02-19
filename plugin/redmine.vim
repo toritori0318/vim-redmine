@@ -165,7 +165,7 @@ function! RedmineEditTicket(issue_id, text)
 endfunc
 function! RedmineAPIIssueEdit(issue_id, text)
     let url = RedmineCreateCommand('issue_edit', a:issue_id, '')
-    let tx = a:text
+    let tx = iconv(a:text, &encoding, "utf-8")
     let tx = substitute(tx, '&', '\&amp;',  'g')
     let tx = substitute(tx, '<', '\&lt;',   'g')
     let tx = substitute(tx, '>', '\&gt;',   'g')
