@@ -59,7 +59,11 @@ Command
 * RedmineEditTicket <issue_id> <edit_text>
  チケット編集します
 
+* RedmineAddTicket <subject>
+ チケットを追加します
 
+* RedmineAddTicketWithDiscription <subject>
+ 本文付きでチケットを追加します
 
 Global Variable
 ========
@@ -80,4 +84,17 @@ Global Variable
  RedmineViewMyProjectTicketで利用されるプロジェクトid
  必須ではありません。指定がない場合は自動でマイプロジェクトを検索してくれます
 
+* redmine_project_id_remember
+ 指定がある場合、チケット追加時にプロジェクトIDを一度選択するとそれを記憶します。
+ 必須ではありません。デフォルト 1 (記憶する)
+
+* redmine_temporary_dir
+ 必須ではありません。編集用の一時ディレクトリを指定します。
+ デフォルト $HOME/.redmine-vim/
+
+ChangeLog
+========
+2012-02-19 by kakkyz (@kakkyz81)
+- RedmineEditTicketでの文字化けを修正
+- 新規チケットを追加するRedmineAddTicket、本文を編集して追加できるRedmineAddTicketWithDiscription追加
 
