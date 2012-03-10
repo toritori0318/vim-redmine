@@ -59,6 +59,11 @@ Command
 * RedmineEditTicket <issue_id> <edit_text>
  Edit Ticket.
 
+* RedmineAddTicket <subject>
+ Add Ticket.
+
+* RedmineAddTicketWithDiscription <subject>
+ Add Ticket with discription.
 
 Global Variable
 ========
@@ -79,4 +84,17 @@ Global Variable
  used in RedmineViewMyProjectTicket.
  This is not required. "MyProject" will be retrieved automatically if you don't specify project_id.
 
+* redmine_project_id_remember
+ If this variable is 1, remember projectId when add ticket.
+ This is not required, default value is 1.
+
+* redmine_temporary_dir
+ Set temp directory.
+ This is not required, default value is $HOME/.redmine-vim/
+
+ChangeLog
+========
+2012-02-19 by kakkyz (@kakkyz81)
+- fix multibyte character problem
+- Add RedmineAddTicket and RedmineAddTicketWithDiscription
 
