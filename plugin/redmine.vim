@@ -56,13 +56,13 @@ function! RedmineSearchTicket(args)
 endfunc
 function! RedmineAPIIssueList(args)
     let url = RedmineCreateCommand('issue_list', '', a:args)
-    let ret = http#get(url)
+    let ret = webapi#http#get(url)
     if ret.content == ' '
         return 0
     endif
 
     let num = 0
-    let dom = xml#parse(ret.content)
+    let dom = webapi#xml#parse(ret.content)
     for elem in dom.findAll("issue")
       echo "#" . elem.find("id").value() . ' ' . elem.find("description").value()
       let num += 1
@@ -86,13 +86,13 @@ function! RedmineSearchProject(input_flg)
 endfunc
 function! RedmineAPIProjects()
     let url = RedmineCreateCommand('project_list','','')
-    let ret = http#get(url)
+    let ret = webapi#http#get(url)
     if ret.content == ' '
         return 0
     endif
 
     let num = 0
-    let dom = xml#parse(ret.content)
+    let dom = webapi#xml#parse(ret.content)
     for elem in dom.findAll("project")
       echo "#" . elem.find("id").value() . ' ' . elem.find("name").value()
       let num += 1
@@ -109,13 +109,13 @@ endfunc
 
 function! RedmineViewTicket(id)
     let url = RedmineCreateCommand('issue_list', a:id, {'include' : 'journals'})
-    let ret = http#get(url)
+    let ret = webapi#http#get(url)
     if ret.content == ' '
         return 0
     endif
 
     let num = 0
-    let dom = xml#parse(ret.content)
+    let dom = webapi#xml#parse(ret.content)
     echo "#" . dom.find("id").value() . ' ' . dom.find("subject").value()
     echo "\n"
     echo dom.find("description").value()
@@ -186,7 +186,7 @@ function! RedmineAPIIssueEdit(issue_id, text)
     let tx = substitute(tx, '"', '\&quot;', 'g')
     let put_xml = '<issue><notes>'. tx .'</notes></issue>'
     echo put_xml
-    let ret = http#post(url, put_xml, {'Content-Type' : 'text/xml'} , 'PUT')
+    let ret = webapi#http#post(url, put_xml, {'Content-Type' : 'text/xml'} , 'PUT')
 endfunc
 
 function! RedmineAddTicket(subject)
@@ -224,7 +224,7 @@ function! s:redmineAddTicketPost(subject, project_id, ...)
         let put_xml .= '<description>' . iconv(l:discription, &encoding, "utf-8") . '</description>'
     endif
     let put_xml .= '</issue>'
-    let ret = http#post(url, put_xml, {'Content-Type' : 'text/xml'} , 'POST')
+    let ret = webapi#http#post(url, put_xml, {'Content-Type' : 'text/xml'} , 'POST')
     echomsg ' Add ticket "' . a:subject . '" complete.'
 endfunc
 
