@@ -94,6 +94,9 @@ Global Variable
 
 ChangeLog
 ========
+2012-05-06 by vsushkov
+ - fix support new webapi
+
 2012-02-19 by kakkyz (@kakkyz81)
 - RedmineEditTicketでの文字化けを修正
 - 新規チケットを追加するRedmineAddTicket、本文を編集して追加できるRedmineAddTicketWithDiscription追加
