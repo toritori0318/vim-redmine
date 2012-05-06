@@ -64,7 +64,7 @@ function! RedmineAPIIssueList(args)
     let num = 0
     let dom = webapi#xml#parse(ret.content)
     for elem in dom.findAll("issue")
-      echo "#" . elem.find("id").value() . ' ' . elem.find("description").value()
+      echo "#" . elem.find("id").value() . ' ' . elem.find("subject").value()
       let num += 1
     endfor
     return num
