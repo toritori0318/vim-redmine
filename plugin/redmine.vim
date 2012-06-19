@@ -31,6 +31,7 @@ endif
 command RedmineViewAllTicket :call RedmineViewAllTicket()
 command RedmineViewMyTicket :call RedmineViewMyTicket()
 command RedmineViewMyProjectTicket :call RedmineViewMyProjectTicket()
+command RedmineViewAssignedTicket :call RedmineViewAssignedTicket()
 command -nargs=* RedmineSearchTicket :call RedmineSearchTicket(<f-args>)
 command -nargs=* RedmineSearchProject :call RedmineSearchProject(0)
 command -nargs=* RedmineEditTicket :call RedmineEditTicket(<f-args>)
@@ -105,6 +106,10 @@ endfunc
 
 function! RedmineViewMyTicket()
     call RedmineSearchTicket({'author_id' : g:redmine_author_id})
+endfunc
+
+function! RedmineViewAssignedTicket()
+    call RedmineSearchTicket({'assigned_to_id' : g:redmine_author_id})
 endfunc
 
 function! RedmineViewTicket(id)
