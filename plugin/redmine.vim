@@ -32,6 +32,7 @@ command RedmineViewAllTicket :call RedmineViewAllTicket()
 command RedmineViewMyTicket :call RedmineViewMyTicket()
 command RedmineViewMyProjectTicket :call RedmineViewMyProjectTicket()
 command RedmineViewAssignedTicket :call RedmineViewAssignedTicket()
+command RedmineViewAssignedProjectTicket :call RedmineViewAssignedProjectTicket()
 command -nargs=* RedmineSearchTicket :call RedmineSearchTicket(<f-args>)
 command -nargs=* RedmineSearchProject :call RedmineSearchProject(0)
 command -nargs=* RedmineEditTicket :call RedmineEditTicket(<f-args>)
@@ -136,6 +137,20 @@ endfunc
 
 function! RedmineViewMyProjectTicket()
     let cond = {'author_id' : g:redmine_author_id}
+    if !empty(g:redmine_project_id)
+        let cond['project_id'] = g:redmine_project_id
+        call RedmineSearchTicket(cond)
+    else
+        let project_id = RedmineSearchProject(1)
+        if !empty(project_id)
+            let cond['project_id'] = project_id
+            call RedmineSearchTicket(cond)
+        endif
+    endif
+endfunc
+
+function! RedmineViewAssignedProjectTicket()
+    let cond = {'assigned_to_id' : g:redmine_author_id}
     if !empty(g:redmine_project_id)
         let cond['project_id'] = g:redmine_project_id
         call RedmineSearchTicket(cond)

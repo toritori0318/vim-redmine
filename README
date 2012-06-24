@@ -43,11 +43,18 @@ Command
 * RedmineViewAllTicket
  All tickets are displayed.
 
-* RedmineViewMyTicket
+* RedmineViewAssignedTicket
  Assigned ticket is displayed. (required g:redmine_author_id)
 
-* RedmineViewMyProjectTicket
+* RedmineViewAssignedProjectTicket
  Assigned ticket is displayed. (required g:redmine_author_id)
+ You can also specify Project_id. 
+
+* RedmineViewMyTicket
+ Report ticket is displayed. (required g:redmine_author_id)
+
+* RedmineViewMyProjectTicket
+ Report ticket is displayed. (required g:redmine_author_id)
  You can also specify Project_id. 
 
 * RedmineSearchTicket <condition>
@@ -94,6 +101,9 @@ Global Variable
 
 ChangeLog
 ========
+2012-06-24 by kawaken
+- add RedmineViewAssignedTicket and RedmineViewAssignedProjectTicket
+
 2012-05-06 by vsushkov
 - fix support new webapi
 

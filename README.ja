@@ -43,11 +43,18 @@ Command
 * RedmineViewAllTicket
  全てのチケットを表示します
 
-* RedmineViewMyTicket
+* RedmineViewAssignedTicket
  自分の担当チケットを表示します（要redmine_author_id）
 
-* RedmineViewMyProjectTicket
+* RedmineViewAssignedProjectTicket
  自分の担当チケットを表示します（要redmine_author_id）
+ 条件にプロジェクトIDも指定できます
+
+* RedmineViewMyTicket
+ 自分の報告チケットを表示します（要redmine_author_id）
+
+* RedmineViewMyProjectTicket
+ 自分の報告チケットを表示します（要redmine_author_id）
  条件にプロジェクトIDも指定できます
 
 * RedmineSearchTicket <condition>
@@ -94,8 +101,11 @@ Global Variable
 
 ChangeLog
 ========
+2012-06-24 by kawaken
+- add RedmineViewAssignedTicket and RedmineViewAssignedProjectTicket
+
 2012-05-06 by vsushkov
- - fix support new webapi
+- fix support new webapi
 
 2012-02-19 by kakkyz (@kakkyz81)
 - RedmineEditTicketでの文字化けを修正
